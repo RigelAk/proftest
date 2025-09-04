@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" name="viewport"/>
+<title>ПрофТест — by @Ave7Eva</title>
+<meta content="@Ave7Eva" name="author"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="#0b0d10" name="theme-color"/>
+<style>
+    :root{
+      --bg:#0b0d10;--card:#12151a;--muted:#8a93a6;--text:#e8ecf1;--accent:#7c5cff;--accent-2:#2dd4bf;--accent-3:#f43f5e;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--shadow:0 10px 30px rgba(0,0,0,.35);
+      --safe-b: env(safe-area-inset-bottom); --safe-t: env(safe-area-inset-top);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{height:100%;-webkit-text-size-adjust:100%}
+    body{min-height:100%;margin:0;background:linear-gradient(180deg,#0a0c0f,#0e1117 30%,#0a0c0f);color:var(--text);font:16px/1.5 'Gilroy', ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{position:sticky;top:0;background:rgba(11,13,16,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #1f2430;z-index:10}
+    header .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:12px 24px;padding-top:calc(12px + var(--safe-t))}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo .dot{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff, #b0a3ff 30%, #7c5cff)}
+    .logo h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.3px}
+    .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.35)}
+    .grid{display:grid;gap:16px}
+    .card{background:linear-gradient(180deg,#12151a,#0f1217);border:1px solid #1f2430;border-radius:16px;box-shadow:var(--shadow)}
+    .card .inner{padding:20px}
+    .title{font-size:22px;margin:0 0 12px;font-weight:800}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .row.center{align-items:center}
+    .btn{border:0;outline:0;cursor:pointer;padding:12px 18px;border-radius:12px;font-weight:700;letter-spacing:.2px;transition:transform .08s ease,box-shadow .2s ease}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),#9a85ff);color:#fff;box-shadow:0 8px 20px rgba(124,92,255,.35)}
+    .btn.ghost{background:transparent;border:1px solid #2a3140;color:var(--text)}
+    .btn:active{transform:scale(.98)}
+    .progress{height:10px;background:#171b24;border-radius:999px;overflow:hidden}
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
+
+    /* Likert */
+    .likert{display:grid;grid-template-columns:1fr minmax(240px,320px);gap:14px;align-items:center}
+    .q{padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid #1f2430}
+    .scale{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .pill{position:relative}
+    .pill input{appearance:none;width:100%;height:42px;background:#131822;border-radius:10px;border:1px solid #232a3a;cursor:pointer}
+    .pill input:checked{outline:2px solid var(--accent);border-color:transparent}
+    .pill label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#9aa3b7;pointer-events:none}
+    .legend{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;color:#9aa3b7}
+
+    /* Pager — мобильный док-бар */
+    .pager{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+    .pager.mobile{position:sticky;bottom:0;left:0;right:0;padding:12px 16px;padding-bottom:calc(12px + var(--safe-b));background:rgba(10,12,15,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid #1f2430;z-index:15}
+    .pager .btn{min-height:44px}
+    .pager .btn.primary{flex:1}
+
+    /* Results */
+    .results{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .type-chip{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #2a3140;background:rgba(124,92,255,.08)}
+    .bars{display:grid;gap:12px}
+    .bar{display:grid;grid-template-columns:100px 1fr 60px;gap:12px;align-items:center}
+    .bar .track{height:12px;background:#171b24;border-radius:999px;overflow:hidden}
+    .bar .fill{height:100%;background:linear-gradient(90deg,var(--accent-2),#14b8a6)}
+    .tag{display:inline-flex;padding:8px 12px;border-radius:999px;background:#151924;border:1px solid #21283a;color:#d0d6e4;font-size:13px;margin:4px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .jobs{display:grid;gap:8px}
+    .job{display:grid;grid-template-columns:48px 1fr 72px;gap:10px;align-items:center;padding:10px;border:1px solid #262c3c;border-radius:12px;background:rgba(255,255,255,.02)}
+    .job .p{height:10px;background:#171b24;border-radius:6px;overflow:hidden}
+    .job .p>div{height:100%;background:linear-gradient(90deg,var(--accent),#a78bfa)}
+    .note{font-size:12px;color:#9aa3b7}
+
+    /* Печатный заголовок */
+    .print-header{display:none}
+
+    /* Cursor glow — скрываем на iPhone */
+    .cursor{position:fixed;top:0;left:0;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#9a85ff 0,#7c5cff00 60%);mix-blend-mode:screen;opacity:.6;transition:transform .02s}
+    @media (hover:none){.cursor{display:none}}
+
+    /* iPhone / маленькие экраны */
+    @media (max-width: 640px){
+      body{font-size:15px}
+      .container{padding:16px}
+      header .wrap{padding:10px 16px;padding-top:calc(10px + var(--safe-t))}
+      .logo h1{font-size:16px}
+      .title{font-size:20px}
+      .card .inner{padding:16px}
+      .likert{grid-template-columns:1fr}
+      .results{grid-template-columns:1fr}
+      .two-col{grid-template-columns:1fr}
+      .bar{grid-template-columns:90px 1fr 48px}
+      .scale{grid-template-columns:repeat(7, minmax(36px,1fr))}
+      .pill input{height:40px;border-radius:12px}
+      .pager{gap:8px}
+      .row{gap:8px}
+      .btn{padding:12px 14px;border-radius:14px}
+    }
+
+    /* Печать */
+    @media print{
+      @page{size:A4;margin:10mm}
+      *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      body{background:#fff;color:#000;font-size:12px}
+      header,#footer,.pager.mobile,#againBtn,#saveBtn,#prevBtn,#nextBtn,#restoreBtn,#startBtn,#intro,#quiz,.cursor{display:none!important}
+      main.container{padding:0}
+      .results{grid-template-columns:1fr;gap:8px}
+      .card,.card .inner{background:#fff;border:0;box-shadow:none;padding:8px}
+      .title{font-size:16px;margin:0 0 6px}
+      h4{margin:8px 0 6px}
+      p,li,.tag{font-size:12px}
+      .print-header{display:block;margin:0 0 8px}
+      .bar,.job{break-inside:avoid;page-break-inside:avoid}
+      .two-col{grid-template-columns:1fr 1fr;gap:10px}
+    }
+
+    /* Уважение к настройкам пользователя */
+    @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+
+    /* ===== PDF composer styles (off-screen A4 sheet) ===== */
+    #pdfSheet{
+      position:fixed;left:-10000px;top:0;
+      width:794px; /* A4 ~ 210mm @ 96dpi */
+      padding:14px 18px;
+      background:#0b0d10;color:#ffffff;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      line-height:1.35;
+    }
+    #pdfSheet .h1{font-size:18px;font-weight:800;margin:0 0 6px}
+    #pdfSheet .sub{font-size:12px;color:#ffffff;margin:0 0 10px}
+    #pdfSheet .chip{display:inline-flex;gap:8px;align-items:center;border:1px solid #e5e7eb;border-radius:999px;padding:4px 10px;font-weight:700}
+    #pdfSheet .chip small{font-weight:600;opacity:.7}
+    #pdfSheet .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:10px}
+    #pdfSheet .card{border:1px solid #e5e7eb;border-radius:10px;padding:10px}
+    #pdfSheet h3{font-size:14px;margin:0 0 6px}
+    #pdfSheet p, #pdfSheet li, #pdfSheet .tag{font-size:11px}
+    #pdfSheet .tags{display:flex;flex-wrap:wrap;gap:6px}
+    #pdfSheet .tag{display:inline-flex;border:1px solid #e5e7eb;border-radius:999px;background:#f8fafc;padding:4px 8px;color:#111}
+    #pdfSheet .bars{display:grid;gap:6px}
+    #pdfSheet .pbar{display:grid;grid-template-columns:1fr 34px;gap:6px;align-items:center}
+    #pdfSheet .track{height:8px;background:#edf2f7;border-radius:999px;overflow:hidden}
+    #pdfSheet .fill{height:100%;background:linear-gradient(90deg,#7c5cff,#2dd4bf);width:0%}
+    #pdfSheet .jobs{display:grid;gap:6px}
+    #pdfSheet .job{display:grid;grid-template-columns:1fr 26px;gap:8px;align-items:center}
+    #pdfSheet .job .track{height:8px;background:#edf2f7;border-radius:999px;overflow:hidden}
+    #pdfSheet .job .fill{height:100%;background:linear-gradient(90deg,#2dd4bf,#14b8a6);width:0%}
+    #pdfSheet ul.compact{margin:0;padding-left:16px}
+    #pdfSheet ul.compact li{margin:0 0 3px}
+    #pdfSheet .cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    #pdfSheet .note{font-size:10px;color:#ffffff;margin-top:6px}
+  
+.note { color: #ffffff !important; }
+
+#pdfSheet .sub, #pdfSheet .note{ color: #ffffff !important; }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/font-gilroy/css/gilroy.css" rel="stylesheet"/></head>
+<body>
+<div aria-hidden="true" class="cursor"></div>
+<header>
+<div class="wrap">
+<div class="logo">
+<div aria-hidden="true" class="dot"></div>
+<h1>ПрофТест</h1>
+<span class="badge">Интерактивный Тест</span>
+</div>
+<div class="muted">Автор: <strong>@Ave7Eva</strong></div>
+</div>
+</header>
+<main class="container">
+<section class="grid" id="intro">
+<div class="card">
+<div class="inner">
+<h2 class="title">Найдём ваш рабочий стиль и сильные стороны</h2>
+<p class="muted">Ответьте на утверждения по шкале от «совершенно не согласен» до «полностью согласен». Тест рассчитан на 10–12 минут и оценивает 4 оси: общительность, способ обработки информации, стиль решений и отношение к плану.</p>
+<div class="row">
+<label class="q" style="flex:1;min-width:220px">
+<div class="muted" style="margin-bottom:6px">Ваше имя (необязательно)</div>
+<input id="userName" inputmode="text" placeholder="Как вас называть?" style="width:100%;padding:14px;border-radius:14px;border:1px solid #283144;background:#0e1320;color:var(--text)"/>
+</label>
+<button class="btn primary" id="startBtn" type="button">Начать тест</button>
+<button class="btn ghost" id="restoreBtn" title="Продолжить с места, где остановились" type="button">Восстановить</button>
+</div>
+<p class="note">Данные хранятся локально в браузере. Их можно стереть в любое время.</p>
+</div>
+</div>
+</section>
+<section class="grid" hidden="" id="quiz">
+<div class="card">
+<div class="inner">
+<div class="row center" style="justify-content:space-between">
+<div class="muted">Шаг <span id="stepNow">1</span>/<span id="stepAll">1</span></div>
+<div aria-label="Прогресс" class="progress" style="min-width:160px;width:45%"><div id="progressFill"></div></div>
+</div>
+</div>
+</div>
+<div class="grid" id="questionsWrap"></div>
+<div class="pager mobile">
+<button class="btn ghost" id="prevBtn" type="button">← Назад</button>
+<div class="row" style="flex:1;justify-content:flex-end">
+<button class="btn ghost" id="saveBtn" title="Сохранить прогресс" type="button">💾</button>
+<button class="btn primary" id="nextBtn" type="button">Далее →</button>
+</div>
+</div>
+</section>
+<section class="grid" hidden="" id="results">
+<!-- Печатный заголовок -->
+<div class="print-header">
+<h2 style="margin:0">ПрофТест — Результаты</h2>
+<div class="muted">Имя: <strong id="printName">—</strong> · Дата: <span id="printDate"></span></div>
+</div>
+<div class="results">
+<div class="card">
+<div class="inner">
+<h3 class="title" id="typeTitle">Ваш тип</h3>
+<div class="row center" style="gap:10px;margin-bottom:12px">
+<span class="type-chip"><strong id="typeCode">—</strong><span id="typeName"></span></span>
+<span class="tag" id="tagline">Описание</span>
+</div>
+<p class="muted" id="personLine" style="margin-top:-6px">Имя: <strong id="personName">—</strong></p>
+<p id="summary" style="margin-top:0"></p>
+<div class="two-col">
+<div>
+<h4>Разложение по осям</h4>
+<div class="bars" id="axesBars"></div>
+</div>
+<div>
+<h4>Ключевые качества</h4>
+<div class="row" id="strengths"></div>
+</div>
+</div>
+<h4 style="margin-top:18px">Практические советы</h4>
+<ul id="advice"></ul>
+<div class="row" style="gap:10px;margin-top:10px">
+<button class="btn primary" id="printBtn" type="button">Скачать/распечатать</button>
+<button class="btn ghost" id="againBtn" type="button">Пройти заново</button>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="inner">
+<h4 class="title">Профнавигация</h4>
+<p class="muted" style="margin-top:-6px">Подборка направлений и сред, где ваш стиль особенно раскрывается. Проценты = степень соответствия.</p>
+<div class="jobs" id="jobs"></div>
+<div class="row" id="envTags" style="margin-top:6px"></div>
+<p class="note">Подборка носит рекомендательный характер. Уточняйте её реальными задачами и рынком.</p>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="inner">
+<h4 class="title">Индивидуальный разбор ответов</h4>
+<div id="deepDive"></div>
+</div>
+</div>
+</section>
+<section class="grid" id="footer" style="margin-top:16px">
+<div class="card"><div class="inner"><div class="row center" style="justify-content:space-between"><span class="muted">© <span id="year"></span> Автор: <strong>@Ave7Eva</strong></span><button class="btn ghost" id="wipeBtn" type="button">Очистить данные</button></div></div></div>
+</section>
+</main>
+<script>
+  // ===== iOS helpers =====
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isIOS){
+    // Убираем задержку клика на iOS Safari
+    document.addEventListener('touchend',()=>{}, {passive:true});
+  }
+
+  // ===== Fancy cursor glow (отключаем на устройствах без hover) =====
+  const cursor = document.querySelector('.cursor');
+  if(matchMedia('(hover:hover)').matches){
+    window.addEventListener('pointermove', (e)=>{ cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
+  }
+
+  // ===== Utils =====
+  const $ = (sel,root=document)=>root.querySelector(sel);
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+  const clamp = (n,min=0,max=100)=>Math.max(min,Math.min(max,n));
+  const seedRand = (seed)=>{ let x = 0; for (let i=0;i<seed.length;i++) x ^= seed.charCodeAt(i) << (i%8); return ()=>{x ^= x<<13; x ^= x>>>17; x ^= x<<5; return ((x>>>0)%1000)/1000}; };
+
+  // ===== Data model =====
+  const AXES = [
+    {pos:'E',neg:'I', name:['Экстраверсия','Интроверсия']},
+    {pos:'S',neg:'N', name:['Сенсорика','Интуиция']},
+    {pos:'F',neg:'T', name:['Чувство','Логика']},
+    {pos:'P',neg:'J', name:['Восприятие','Суждение']},
+  ];
+
+  // 48 утверждений
+  const QUESTIONS = [
+    // E / I
+    {axis:'E',key:+1,facet:'общение',text:'Мне легко заводить разговор с незнакомцами и поддерживать его без пауз.'},
+    {axis:'E',key:+1,facet:'энергия', text:'Громкие и живые мероприятия меня заряжают, а не утомляют.'},
+    {axis:'E',key:+1,facet:'влияние', text:'Я часто становлюсь центром внимания в компании.'},
+    {axis:'E',key:+1,facet:'командность', text:'Люблю работать в командах и быстро чувствую атмосферу группы.'},
+    {axis:'E',key:+1,facet:'экспромт', text:'Импровизация даётся легко; план нужен скорее как ориентир.'},
+    {axis:'E',key:+1,facet:'дипломатия',text:'Умею разрядить напряжённый разговор шуткой или тёплой репликой.'},
+    {axis:'E',key:-1,facet:'перезарядка',text:'После длинного дня предпочитаю одиночество даже больше, чем беседу.'},
+    {axis:'E',key:-1,facet:'фокус',    text:'В шумной среде мне сложно думать и работать.'},
+    {axis:'E',key:-1,facet:'селфтайм', text:'Лучшие идеи приходят, когда я один/одна и меня никто не отвлекает.'},
+    {axis:'E',key:-1,facet:'глубина',  text:'Один глубокий разговор ценнее для меня, чем много коротких.'},
+    {axis:'E',key:-1,facet:'экономия', text:'Я избегаю лишних встреч и предпочитаю общаться по делу.'},
+    {axis:'E',key:-1,facet:'наблюдение',text:'Чаще наблюдаю со стороны, чем вступаю в разговор первым(ой).'},
+
+    // S / N
+    {axis:'S',key:+1,facet:'наблюд',  text:'Быстро замечаю детали: запахи, цвета, мелкие изменения вокруг.'},
+    {axis:'S',key:+1,facet:'практика',text:'Предпочитаю инструкции и конкретику абстрактным идеям.'},
+    {axis:'S',key:+1,facet:'реализм', text:'Скептически отношусь к теориям без практической проверки.'},
+    {axis:'S',key:+1,facet:'рутина',  text:'Повторяющиеся задачи не пугают, если они дают стабильный результат.'},
+    {axis:'S',key:+1,facet:'точность',text:'Люблю аккуратность и ясность в документах и интерфейсах.'},
+    {axis:'S',key:+1,facet:'опыт',    text:'Опираюсь на прошлый опыт больше, чем на интуицию.'},
+    {axis:'S',key:-1,facet:'видение', text:'Часто вижу скрытые связи и возможности, которые другие не замечают.'},
+    {axis:'S',key:-1,facet:'гипотезы', text:'Фантазировать о будущем у меня получается легче, чем описывать настоящее.'},
+    {axis:'S',key:-1,facet:'инсайт',  text:'Идеи вспыхивают внезапно, без пошагового анализа.'},
+    {axis:'S',key:-1,facet:'риски',   text:'Готов(а) пробовать новое, даже если плана ещё нет.'},
+    {axis:'S',key:-1,facet:'метафоры',text:'Люблю метафоры, концепции, большие картины.'},
+    {axis:'S',key:-1,facet:'варианты',text:'Часто генерирую множество вариантов вместо одной «правильной» идеи.'},
+
+    // F / T
+    {axis:'F',key:+1,facet:'эмпатия', text:'Легко чувствую эмоции людей и стараюсь поддержать.'},
+    {axis:'F',key:+1,facet:'гармония',text:'Избегаю конфликтов и предпочитаю мягкие формулировки.'},
+    {axis:'F',key:+1,facet:'ценности',text:'Принимая решения, учитываю влияние на людей, а не только цифры.'},
+    {axis:'F',key:+1,facet:'обратная',text:'Критика может задевать меня сильнее, чем хотелось бы.'},
+    {axis:'F',key:+1,facet:'доброта', text:'Стараюсь благодарить и хвалить чаще, чем указывать на ошибки.'},
+    {axis:'F',key:+1,facet:'мораль',  text:'Честность и забота важнее выигрыша любой ценой.'},
+    {axis:'F',key:-1,facet:'рационал',text:'В споре опираюсь на логику, данные и причинно-следственные связи.'},
+    {axis:'F',key:-1,facet:'прямота', text:'Предпочитаю говорить прямо, даже если это кому-то неприятно.'},
+    {axis:'F',key:-1,facet:'справедл',text:'Равные правила для всех важнее исключений из сострадания.'},
+    {axis:'F',key:-1,facet:'холодок', text:'Могу отделять эмоции от решения, если ситуация требует строгости.'},
+    {axis:'F',key:-1,facet:'дебаты',  text:'Люблю конструктивные споры: так быстрее находим истину.'},
+    {axis:'F',key:-1,facet:'точность',text:'Дразнит, когда аргументы подменяют настроением или «ощущениями».'.replace('«','"').replace('»','"')},
+
+    // P / J
+    {axis:'P',key:+1,facet:'гибкость',text:'Оставляю пространство для спонтанности и неожиданных возможностей.'},
+    {axis:'P',key:+1,facet:'легкость',text:'Регламенты и жёсткие правила быстро утомляют.'},
+    {axis:'P',key:+1,facet:'адапт',   text:'Быстро перестраиваюсь при изменениях планов.'},
+    {axis:'P',key:+1,facet:'переключ',text:'Люблю делать несколько вещей параллельно.'},
+    {axis:'P',key:+1,facet:'импульс', text:'Иногда действую по наитию — и часто это работает.'},
+    {axis:'P',key:+1,facet:'сроки',   text:'К дедлайнам прихожу в режиме «спринта» ближе к финишу.'},
+    {axis:'P',key:-1,facet:'структура',text:'Получаю удовольствие от списков, дедлайнов и завершения задач.'},
+    {axis:'P',key:-1,facet:'предсказ',text:'Предпочитаю план на неделю вперёд и фиксированные договорённости.'},
+    {axis:'P',key:-1,facet:'монотаск',text:'Лучше делаю одно дело, доводя его до конца.'},
+    {axis:'P',key:-1,facet:'контроль',text:'Комфортнее, когда процесс под контролем и мало сюрпризов.'},
+    {axis:'P',key:-1,facet:'системн', text:'Систематизация и порядок помогают мне сохранять фокус.'},
+    {axis:'P',key:-1,facet:'раннийстарт',text:'Предпочитаю начинать заранее, а не откладывать до последнего.'},
+  ];
+
+  const PAGE_SIZE = 6; const STEPS = Math.ceil(QUESTIONS.length / PAGE_SIZE);
+
+  const TYPE_NAMES = {
+    'ESFP':'Душа компании', 'ESFJ':'Наставник', 'ESTP':'Маршал действий', 'ESTJ':'Администратор',
+    'ENFP':'Вдохновитель',  'ENFJ':'Объединитель', 'ENTP':'Изобретатель',  'ENTJ':'Организатор',
+    'ISFP':'Тонкий стилист', 'ISFJ':'Опекун', 'ISTP':'Мастер-практик', 'ISTJ':'Аудитор',
+    'INFP':'Идеалист', 'INFJ':'Советник', 'INTP':'Мыслитель', 'INTJ':'Стратег'
+  };
+
+  const TAGLINES = { ESFP:['Праздник каждый день','Тёплый двигатель команды','Энергия здесь‑и‑сейчас'], ENFP:['Искры идей','Связывает людей и смыслы'], ENFJ:['Собирает всех в орбиту','Дипломат и мотиватор'], ENTJ:['Смысл → стратегия → результат'], ENTP:['Спрашивает «почему нет?»','Играет идеями'], ESTP:['Действуй сейчас','Решает на месте'], ESTJ:['Процессы в порядке'], ESFJ:['Забота как система'], ISFP:['Тихая эстетика'], ISFJ:['Надёжное плечо'], ISTP:['Инженер хакинга реальности'], ISTJ:['Метод и порядок'], INFP:['Ценности и смысл'], INFJ:['Глубина и поддержка'], INTP:['Лаборатория мысли'], INTJ:['План 1–3–5 лет'] };
+
+  const ESFP_DETAIL = { strengths:['Позитив и умение разрежать напряжение','Высокая эмпатия и чувствительность к людям','Адаптивность и готовность к изменениям','Отличное чувство актуальности и трендов'], growth:['Тренируйте спокойный разговор о сложном: «Я вижу так… давай обсудим»','Перед важным решением — 10 минут «холодной головы»: плюсы/минусы, риски, план Б','Большие цели — в маленькие шаги с датами и чек‑листами','Терпение к чужим ошибкам: «неочевидное для меня может быть новым для других»'], env:['Динамика и общение','Минимум бюрократии','Творческая свобода','Тёплая команда'], jobs:[{name:'HR‑специалист',score:90},{name:'Графический дизайнер',score:85},{name:'Интернет‑маркетолог',score:70},{name:'Менеджер проектов',score:50},{name:'Разработчик',score:35},{name:'Аналитик данных',score:20},{name:'Инженер по тестированию',score:15}], notable:['Мэрилин Монро','Адель','Элтон Джон'] };
+
+  // ===== State =====
+  let state = { name:'', answers:Array(QUESTIONS.length).fill(null), step:0, seed: Math.random().toString(36).slice(2) };
+
+  // ===== DOM refs =====
+  const intro = $('#intro');
+  const quiz = $('#quiz');
+  const results = $('#results');
+  const questionsWrap = $('#questionsWrap');
+  const stepNow = $('#stepNow');
+  const stepAll = $('#stepAll');
+  const progressFill = $('#progressFill');
+
+  // ===== Init =====
+  $('#year').textContent = new Date().getFullYear();
+  stepAll.textContent = STEPS;
+
+  $('#startBtn')?.addEventListener('click', ()=>{ state.name = $('#userName').value.trim(); startTest(); });
+  $('#restoreBtn')?.addEventListener('click', restore);
+  $('#wipeBtn')?.addEventListener('click', ()=>{try{localStorage.removeItem('proftest-v1');}catch{} alert('Данные удалены.');});
+
+  $('#prevBtn')?.addEventListener('click', ()=>{ if(state.step>0){state.step--; renderPage();} });
+  $('#nextBtn')?.addEventListener('click', nextOrFinish);
+  $('#saveBtn')?.addEventListener('click', save);
+  $('#againBtn')?.addEventListener('click', ()=>{state={...state,answers:Array(QUESTIONS.length).fill(null),step:0}; show(quiz); hide(results); renderPage(); window.scrollTo({top:0,behavior:'smooth'});});
+  $('#printBtn')?.addEventListener('click', downloadPdf);
+
+  // Клавиатура iOS может перекрывать док-бар — скроллим к актуальному вопросу при фокусе на инпуте имени
+  $('#userName')?.addEventListener('focus', e=>{ setTimeout(()=>e.target.scrollIntoView({block:'center',behavior:'smooth'}), 250); });
+
+  document.addEventListener('keydown', (e)=>{
+    if(results.hidden) {
+      if(e.key==='ArrowRight') nextOrFinish();
+      if(e.key==='ArrowLeft')  { if(state.step>0){state.step--; renderPage();} }
+    }
+  });
+
+  function startTest(){ hide(intro); show(quiz); renderPage(); }
+
+  function save(){ try{localStorage.setItem('proftest-v1', JSON.stringify(state)); showToast('Сохранено');}catch{showToast('Не удалось сохранить');} }
+  function restore(){
+    let raw=null; try{ raw = localStorage.getItem('proftest-v1'); }catch{}
+    if(!raw){showToast('Сохранений нет');return;}
+    try{ state = JSON.parse(raw); $('#userName').value = state.name||''; hide(intro); show(quiz); renderPage(); showToast('Восстановлено'); }
+    catch{ showToast('Не удалось восстановить'); }
+  }
+
+  function showToast(text){ const t = document.createElement('div'); t.textContent = text; t.style.position='fixed'; t.style.bottom='calc(20px + var(--safe-b))'; t.style.left='50%'; t.style.transform='translateX(-50%)'; t.style.background='#111827'; t.style.color='#e5e7eb'; t.style.padding='10px 14px'; t.style.borderRadius='10px'; t.style.border='1px solid #374151'; t.style.boxShadow= '0 10px 20px rgba(0,0,0,.35)'; t.style.zIndex=9999; document.body.appendChild(t); setTimeout(()=>t.remove(), 1600); }
+
+  function show(el){ el.hidden=false; }
+  function hide(el){ el.hidden=true; }
+
+  function renderPage(){
+    stepNow.textContent = state.step+1;
+    progressFill.style.width = (100*(state.step)/STEPS) + '%';
+
+    const start = state.step*PAGE_SIZE;
+    const slice = QUESTIONS.slice(start, start+PAGE_SIZE);
+
+    questionsWrap.innerHTML = '';
+
+    slice.forEach((q, idx)=>{
+      const i = start+idx;
+      const card = document.createElement('div'); card.className = 'card';
+      const scaleHtml = [1,2,3,4,5,6,7].map(val=>{
+        const id = `q${i}_${val}`;
+        const checked = state.answers[i]===val? 'checked' : '';
+        const aria = val===1? 'Совершенно не согласен' : val===7? 'Полностью согласен' : `Вариант ${val}`;
+        return `<div class="pill"><input type="radio" name="q${i}" id="${id}" ${checked} aria-label="${aria}"/>\
+                <label for="${id}">${val}</label></div>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="inner">
+          <div class="likert">
+            <div>
+              <div class="muted">${String(i+1).padStart(2,'0')}</div>
+              <div class="q">${q.text}</div>
+            </div>
+            <div>
+              <div class="scale" role="radiogroup" aria-label="Шкала согласия">${scaleHtml}</div>
+              <div class="legend"><span>совсем нет</span><span>да, полностью</span></div>
+            </div>
+          </div>
+        </div>`;
+
+      card.addEventListener('change', (e)=>{
+        if(e.target && e.target.matches('input[type="radio"]')){
+          const id = e.target.id; const val = parseInt(id.split('_')[1],10);
+          state.answers[i] = val; save();
+        }
+      });
+
+      questionsWrap.appendChild(card);
+    });
+
+    $('#prevBtn').disabled = state.step===0;
+    $('#nextBtn').textContent = (state.step===STEPS-1? 'Показать результат' : 'Далее →');
+  }
+
+  function nextOrFinish(){
+    const start = state.step*PAGE_SIZE;
+    const need = QUESTIONS.slice(start, start+PAGE_SIZE).map((_,i)=>state.answers[start+i]);
+    if(need.some(v=>v===null)) { showToast('Ответьте на все утверждения на этой странице'); return; }
+    if(state.step < STEPS-1){ state.step++; renderPage(); const y = Math.max(0, questionsWrap.getBoundingClientRect().top + window.scrollY - 80); window.scrollTo({top:y,behavior:'smooth'}); }
+    else { finalize(); }
+  }
+
+  function finalize(){ const report = buildReport(); renderResults(report); hide(quiz); show(results); const y = Math.max(0, results.getBoundingClientRect().top + window.scrollY - 80); window.scrollTo({top:y,behavior:'smooth'}); }
+
+  function buildReport(){
+    const sums = {E:0,I:0,S:0,N:0,F:0,T:0,P:0,J:0}; const facets = {};
+    QUESTIONS.forEach((q, idx)=>{
+      const raw = state.answers[idx]; const centered = raw - 4; const delta = centered * q.key;
+      if(q.axis==='E'){ sums.E += Math.max(0,delta); sums.I += Math.max(0,-delta); }
+      if(q.axis==='S'){ sums.S += Math.max(0,delta); sums.N += Math.max(0,-delta); }
+      if(q.axis==='F'){ sums.F += Math.max(0,delta); sums.T += Math.max(0,-delta); }
+      if(q.axis==='P'){ sums.P += Math.max(0,delta); sums.J += Math.max(0,-delta); }
+      if(!facets[q.facet]) facets[q.facet] = {sum:0,count:0,axis:q.axis}; facets[q.facet].sum += raw; facets[q.facet].count += 1;
+    });
+
+    const axisPairs = [ ['E','I'], ['S','N'], ['F','T'], ['P','J'] ]; const perc = {};
+    const letters = axisPairs.map(([a,b])=>{ const total = sums[a] + sums[b]; const pa = total ? Math.round(100 * sums[a]/total) : 50; const pb = 100 - pa; perc[a] = pa; perc[b] = pb; return pa>=pb ? a : b; });
+    const code = letters.join('');
+    const facetArr = Object.entries(facets).map(([k,v])=>({name:k,axis:v.axis,score:Math.round((v.sum/v.count-1)/6*100)}));
+    return { name: state.name, code, perc, facetArr, answers:[...state.answers] };
+  }
+
+  function renderResults(r){
+    const seed = seedRand((state.name||'user')+state.seed+r.code);
+    const code = r.code; const name = TYPE_NAMES[code] || 'Рабочий стиль';
+    const tl = TAGLINES[code]||['Баланс сильных сторон']; const tagline = tl[Math.floor(seed()*tl.length)];
+
+    $('#typeCode').textContent = code; $('#typeName').textContent = name; $('#tagline').textContent = tagline;
+
+    const hello = state.name ? `${state.name}, ваш профиль: ` : 'Ваш профиль: ';
+    const intros = ['сильные стороны уже на поверхности, а точки роста — рядом с ними.','вы хорошо чувствуете людей и задачи, осталось настроить режим и приоритеты.','баланс эмоций и фактов в ваших руках; главное — управлять вниманием и временем.'];
+    $('#summary').textContent = hello + name + '. ' + intros[Math.floor(seed()*intros.length)];
+
+    // Имя для печати/экрана
+    $('#personName').textContent = state.name || '—';
+    $('#printName').textContent  = state.name || '—';
+    $('#printDate').textContent  = new Date().toLocaleDateString('ru-RU');
+
+    const bars = $('#axesBars'); bars.innerHTML = '';
+    const labels = {E:'Экстраверсия',I:'Интроверсия',S:'Сенсорика',N:'Интуиция',F:'Чувство',T:'Логика',P:'Восприятие',J:'Суждение'};
+    [['E','I'],['S','N'],['F','T'],['P','J']].forEach(([a,b])=>{ bars.appendChild(bar(labels[a], r.perc[a])); bars.appendChild(bar(labels[b], r.perc[b])); });
+
+    const strengths = $('#strengths'); strengths.innerHTML=''; const advice = $('#advice'); advice.innerHTML='';
+    let strengthsList = [], growthList = [], envTags = [], jobs = [];
+    if(code==='ESFP'){ strengthsList = ESFP_DETAIL.strengths; growthList = ESFP_DETAIL.growth; envTags = ESFP_DETAIL.env; jobs = ESFP_DETAIL.jobs; }
+    else { strengthsList = genStrengths(r); growthList = genGrowth(r); envTags = genEnv(r); jobs = genJobs(r); }
+
+    strengthsList.forEach(s=>strengths.appendChild(tag(s)));
+    const envWrap = $('#envTags'); envWrap.innerHTML=''; envTags.forEach(s=>envWrap.appendChild(tag(s)));
+    advice.append(...growthList.map(text=>{const li=document.createElement('li'); li.textContent=text; return li;}));
+
+    const jobsWrap = $('#jobs'); jobsWrap.innerHTML='';
+    jobs.slice(0,8).forEach(j=>{ const d = document.createElement('div'); d.className='job'; d.innerHTML = `<div class='p' aria-hidden='true'><div style='width:${j.score}%'></div></div><div><strong>${j.name}</strong><div class='note'>Соответствие ~${j.score}%</div></div><div class='muted' style='text-align:right'>${j.score}%</div>`; jobsWrap.appendChild(d); });
+
+    const dd = $('#deepDive'); dd.innerHTML = deepDiveHTML(r, seed);
+  }
+
+  function bar(label, val){ const d = document.createElement('div'); d.className='bar'; d.innerHTML = `<div class='muted'>${label}</div><div class='track'><div class='fill' style='width:${clamp(val)}%'></div></div><div>${clamp(val)}%</div>`; return d; }
+  function tag(text){ const s=document.createElement('span'); s.className='tag'; s.textContent=text; return s; }
+
+  function genStrengths(r){ const out=[]; if(r.perc.E>=60) out.push('Коммуникабельность и быстрый раппорт'); else out.push('Глубокая фокусировка и качество взаимодействий'); if(r.perc.S>=60) out.push('Практичность и внимание к деталям'); else out.push('Видение концепций и возможностей'); if(r.perc.F>=60) out.push('Эмпатия и командная поддержка'); else out.push('Структурное мышление и ясные решения'); if(r.perc.P>=60) out.push('Гибкость и адаптация к изменениям'); else out.push('Системность и доведение до результата'); return out; }
+  function genGrowth(r){ const out=[]; if(r.perc.E>=60) out.push('Оставляйте окна тишины для глубоких задач'); else out.push('Планируйте короткие социальные слоты, чтобы не выпадать из контекста'); if(r.perc.S>=60) out.push('Раз в неделю — «полёт мыслей»: генерируйте дальние гипотезы'); else out.push('Проверяйте идеи пилотами и фактами'); if(r.perc.F>=60) out.push('Договоритесь с собой: критика — про задачу, не про личность'); else out.push('Помните о влиянии решений на людей и атмосферу'); if(r.perc.P>=60) out.push('Делите цели на чек‑пункты и ставьте мягкие дедлайны раньше жёстких'); else out.push('Оставляйте 10% буфера на неожиданные повороты'); return out; }
+  function genEnv(r){ const out=[]; out.push(r.perc.E>=60? 'Живые команды и взаимодействие' : 'Тихие зоны и глубокая работа'); out.push(r.perc.S>=60? 'Конкретика и измеримые задачи' : 'Проектирование и работа с гипотезами'); out.push(r.perc.P>=60? 'Минимум регламентов' : 'Чёткие правила и процессы'); out.push(r.perc.F>=60? 'Доброжелательная культура' : 'Данные, метрики и прозрачные критерии'); return out; }
+  function genJobs(r){ const items = [ {name:'HR‑специалист', w:(r.perc.E+r.perc.F)/2}, {name:'Графический дизайнер', w:(r.perc.S*0.4 + r.perc.F*0.6)}, {name:'Интернет‑маркетолог', w:(r.perc.E*0.5 + (100-r.perc.S)*0.5)}, {name:'Менеджер проектов', w:(((100-r.perc.P))*0.6 + r.perc.E*0.4)}, {name:'Продуктовый аналитик', w:(((100-r.perc.F))*0.6 + (100-r.perc.S)*0.4)}, {name:'Frontend‑разработчик', w:(r.perc.S*0.5 + (100-r.perc.P)*0.5)}, {name:'UX‑исследователь', w:(((100-r.perc.S))*0.5 + r.perc.F*0.5)}, {name:'QA‑инженер', w:(r.perc.S*0.6 + (100-r.perc.P)*0.4)}, {name:'Продюсер контента', w:(r.perc.E*0.5 + r.perc.P*0.5)}, {name:'Data Scientist', w:((100-r.perc.F)*0.7 + (100-r.perc.S)*0.3)} ]; return items.map(x=>({name:x.name, score:Math.round(clamp(x.w))})).sort((a,b)=>b.score-a.score); }
+
+  function deepDiveHTML(r, seed){
+    const dic = { E:['общение','инициативность','импровизация','влияние'], I:['фокус','рефлексия','глубина','наблюдение'], S:['детали','практичность','точность','опыт'], N:['идеи','гипотезы','риски','видение'], F:['эмпатия','поддержка','гармония','ценности'], T:['логика','структура','объективность','дебаты'], P:['гибкость','вариативность','адаптация','спонтанность'], J:['системность','дедлайны','контроль','последовательность'] };
+    const map = [['E','I'],['S','N'],['F','T'],['P','J']];
+    const pick=(a)=>a[Math.floor(seed()*a.length)];
+    const bullets = map.map(([a,b])=>{ const ap=r.perc[a], bp=r.perc[b]; const lead = ap>bp? dic[a]:dic[b]; const tune = ap>bp? pick(['добавляйте тишины и пауз','фиксируйте договорённости письменно','переводите импульс в короткие спринты']) : pick(['планируйте живые обсуждения','проверяйте гипотезы на людях','делайте демо‑дни']); return `<li><strong>${a}/${b}</strong>: преобладает <em>${ap>bp?a:b}</em> — это про ${pick(lead)} и ${pick(lead)}. Настройка: ${tune}.</li>` }).join('');
+    const facetsTop = r.facetArr.sort((a,b)=>b.score-a.score).slice(0,5).map(f=>`<span class='tag'>${f.name}: ${f.score}%</span>`).join('');
+    const notable = (r.code==='ESFP')? `<div class='note'>Вам, вероятно, близки артисты‑экстраверты (например, ${ESFP_DETAIL.notable.join(', ')}).</div>`:'';
+    return `<div class='two-col'><div><h4>Смысл вашего профиля</h4><ul>${bullets}</ul>${notable}</div><div><h4>Факторы, выделяющиеся в ответах</h4><div class='row'>${facetsTop}</div></div></div>`;
+  }
+
+  // ===== PDF Composer =====
+  function buildPdfSheet(r){
+    const seed = seedRand((state.name||'user')+state.seed+r.code);
+    const code = r.code; const name = TYPE_NAMES[code] || 'Рабочий стиль';
+    const tl = TAGLINES[code]||['Баланс сильных сторон']; const tagline = tl[Math.floor(seed()*tl.length)];
+
+    let strengthsList = [], growthList = [], envTags = [], jobs = [];
+    if(code==='ESFP'){ strengthsList = ESFP_DETAIL.strengths; growthList = ESFP_DETAIL.growth; envTags = ESFP_DETAIL.env; jobs = ESFP_DETAIL.jobs; }
+    else { strengthsList = genStrengths(r); growthList = genGrowth(r); envTags = genEnv(r); jobs = genJobs(r); }
+
+    const labels = {E:'Экстраверсия',I:'Интроверсия',S:'Сенсорика',N:'Интуиция',F:'Чувство',T:'Логика',P:'Восприятие',J:'Суждение'};
+    const barsHtml = ['E','I','S','N','F','T','P','J'].map(k=>{
+      return `<div class="pbar"><div><div class="track"><div class="fill" style="width:${clamp(r.perc[k])}%"></div></div><div class="small" style="font-size:10px;color:#ffffff;margin-top:2px">${labels[k]}</div></div><div style="text-align:right;font-size:10px">${clamp(r.perc[k])}%</div></div>`;
+    }).join('');
+
+    const strengthsHtml = strengthsList.map(s=>`<span class="tag">${s}</span>`).join('');
+    const envHtml = envTags.map(s=>`<span class="tag">${s}</span>`).join('');
+    const adviceHtml = growthList.slice(0,6).map(s=>`<li>${s}</li>`).join('');
+    const jobsHtml = jobs.slice(0,8).map(j=>`
+      <div class="job">
+        <div>
+          <div class="track"><div class="fill" style="width:${j.score}%"></div></div>
+          <div class="small" style="font-size:10px;color:#ffffff;margin-top:2px">${j.name}</div>
+        </div>
+        <div style="text-align:right;font-size:10px">${j.score}%</div>
+      </div>
+    `).join('');
+
+    const ddSeed = seed; // reuse for deep dive
+    const dic = { E:['общение','инициативность','импровизация','влияние'], I:['фокус','рефлексия','глубина','наблюдение'], S:['детали','практичность','точность','опыт'], N:['идеи','гипотезы','риски','видение'], F:['эмпатия','поддержка','гармония','ценности'], T:['логика','структура','объективность','дебаты'], P:['гибкость','вариативность','адаптация','спонтанность'], J:['системность','дедлайны','контроль','последовательность'] };
+    const map = [['E','I'],['S','N'],['F','T'],['P','J']];
+    const pick=(a)=>a[Math.floor(ddSeed()*a.length)];
+    const deepBullets = map.map(([a,b])=>{ const ap=r.perc[a], bp=r.perc[b]; const lead = ap>bp? dic[a]:dic[b]; const tune = ap>bp? pick(['добавляйте тишины и пауз','фиксируйте договорённости письменно','переводите импульс в короткие спринты']) : pick(['планируйте живые обсуждения','проверяйте гипотезы на людях','делайте демо‑дни']); return `<li><strong>${a}/${b}</strong>: преобладает <em>${ap>bp?a:b}</em> — ${pick(lead)}; настройка: ${tune}.</li>` }).join('');
+
+    const facetsTop = r.facetArr.sort((a,b)=>b.score-a.score).slice(0,6).map(f=>`<span class="tag">${f.name}: ${f.score}%</span>`).join('');
+
+    const sheet = document.getElementById('pdfSheet');
+    const today = new Date().toLocaleDateString('ru-RU');
+    const hello = state.name ? state.name : '—';
+    sheet.innerHTML = `
+      <div class="h1">ПрофТест — Результаты</div>
+      <div class="sub">Имя: <strong>${hello}</strong> · Дата: ${today}</div>
+      <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="chip"><strong>${code}</strong> <small>${name}</small></span>
+        <span class="tag">${tagline}</span>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Разложение по осям</h3>
+          <div class="bars">${barsHtml}</div>
+
+          <h3 style="margin-top:10px">Ключевые качества</h3>
+          <div class="tags">${strengthsHtml}</div>
+
+          <h3 style="margin-top:10px">Практические советы</h3>
+          <ul class="compact">${adviceHtml}</ul>
+        </div>
+
+        <div class="card">
+          <h3>Профнавигация</h3>
+          <div class="jobs">${jobsHtml}</div>
+          <h3 style="margin-top:10px">Среда для роста</h3>
+          <div class="tags">${envHtml}</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:10px">
+        <div class="cols2">
+          <div>
+            <h3>Индивидуальный разбор</h3>
+            <ul class="compact">${deepBullets}</ul>
+          </div>
+          <div>
+            <h3>Факторы, выделяющиеся в ответах</h3>
+            <div class="tags">${facetsTop}</div>
+            ${code==='ESFP' ? `<div class="note">Близкие референсы: ${ESFP_DETAIL.notable.join(', ')}.</div>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== PDF Download (compose single page) =====
+  async function downloadPdf() {
+    const { jsPDF } = window.jspdf;
+
+    // Сборка содержимого для PDF
+    const report = buildReport();
+    buildPdfSheet(report);
+    const element = document.getElementById("pdfSheet");
+
+    // Рендерим без фона страницы и без масштабирования под А4
+    const canvas = await html2canvas(element, { scale: 2, backgroundColor: null });
+    const imgData = canvas.toDataURL("image/png");
+
+    // Переводим px в pt (1pt = 1/72", 1px при 96dpi ≈ 0.75pt)
+    const pxToPt = (px)=> px * 72 / 96;
+    const pdfWidth  = pxToPt(canvas.width);
+    const pdfHeight = pxToPt(canvas.height);
+
+    // Создаём PDF размером РОВНО как контент
+    const pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+    pdf.save("proftest-result.pdf");
+
+    // очистка временного слоя
+    element.innerHTML = '';
+  }
+  </script>
+<div id="pdfSheet"></div>
+<!-- PDF libs -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</body>
+</html>
