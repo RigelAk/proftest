@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
 <meta charset="utf-8"/>
@@ -145,7 +144,7 @@
     #pdfSheet ul.compact li{margin:0 0 3px}
     #pdfSheet .cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     #pdfSheet .note{font-size:10px;color:#ffffff;margin-top:6px}
-  
+
 .note { color: #ffffff !important; }
 
 #pdfSheet .sub, #pdfSheet .note{ color: #ffffff !important; }
@@ -499,7 +498,9 @@
 
     const bars = $('#axesBars'); bars.innerHTML = '';
     const labels = {E:'Экстраверсия',I:'Интроверсия',S:'Сенсорика',N:'Интуиция',F:'Чувство',T:'Логика',P:'Восприятие',J:'Суждение'};
-    [['E','I'],['S','N'],['F','T'],['P','J']].forEach(([a,b])=>{ bars.appendChild(bar(labels[a], r.perc[a])); bars.appendChild(bar(labels[b], r.perc[b])); });
+    [['E','I'],['S','N'],['F','T']].forEach(([a,b])=>{ bars.appendChild(bar(labels[a], r.perc[a])); bars.appendChild(bar(labels[b], r.perc[b])); });
+    // keep order of bars P/J last
+    ;[['P','J']].forEach(([a,b])=>{ bars.appendChild(bar(labels[a], r.perc[a])); bars.appendChild(bar(labels[b], r.perc[b])); });
 
     const strengths = $('#strengths'); strengths.innerHTML=''; const advice = $('#advice'); advice.innerHTML='';
     let strengthsList = [], growthList = [], envTags = [], jobs = [];
@@ -617,35 +618,36 @@
     `;
   }
 
-  // ===== PDF Download (compose single page) =====
+  // ===== Download as PNG (converted from previous PDF flow) =====
   async function downloadPdf() {
-    const { jsPDF } = window.jspdf;
-
-    // Сборка содержимого для PDF
+    // 1) Собираем отчёт как раньше
     const report = buildReport();
     buildPdfSheet(report);
     const element = document.getElementById("pdfSheet");
 
-    // Рендерим без фона страницы и без масштабирования под А4
+    // 2) Рендерим слой в canvas
     const canvas = await html2canvas(element, { scale: 2, backgroundColor: null });
-    const imgData = canvas.toDataURL("image/png");
 
-    // Переводим px в pt (1pt = 1/72", 1px при 96dpi ≈ 0.75pt)
-    const pxToPt = (px)=> px * 72 / 96;
-    const pdfWidth  = pxToPt(canvas.width);
-    const pdfHeight = pxToPt(canvas.height);
+    // 3) Сохраняем как PNG вместо PDF
+    await new Promise((resolve)=>{
+      canvas.toBlob((blob)=>{
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "proftest-result.png";
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(a.href);
+        a.remove();
+        resolve();
+      }, 'image/png', 1);
+    });
 
-    // Создаём PDF размером РОВНО как контент
-    const pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-    pdf.save("proftest-result.pdf");
-
-    // очистка временного слоя
+    // 4) Очистка временного слоя
     element.innerHTML = '';
   }
   </script>
 <div id="pdfSheet"></div>
-<!-- PDF libs -->
+<!-- PDF libs (оставляем, чтобы не трогать окружение/механику) -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </body>
